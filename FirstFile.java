@@ -18,22 +18,28 @@ public class FirstFile {
         String[] words = selectCategory();
         String word = selectWord(words);
         getEncodedWord(word);
+        int numberOfAttempts = 3;
 
         println("Загадываемое слово: " + Arrays.toString(encodedWord));
-        while(checkEncodedWord()){
+        while(checkEncodedWord() && numberOfAttempts > 0){
+            println("Осталось попыток: " + numberOfAttempts );
             String replacementLetter = chooseLetter();
             if(replaceLetterInEncodedWord(word, replacementLetter)){
                 println("Вы нашли букву!");
             } else {
                 println("Такой буквы нет...");
+                numberOfAttempts--;
             }
             println(Arrays.toString(encodedWord));
         }
 
-        println("Поздравляем! Вы нашли все буквы!");
-        println("Игра окончена");
-        println("Отгадываемое слово: " + word);
-        println("Количество набранных очков: " + points);
+        if(numberOfAttempts == 0 && checkEncodedWord()){
+            gameLost(word);
+        } else{
+            gameWon(word);
+        }
+
+
     }
 
 
@@ -93,6 +99,20 @@ public class FirstFile {
             }
         }
         return false;
+    }
+
+    public static void gameWon(String word){
+        println("Поздравляем! Вы нашли все буквы!");
+        println("Игра окончена!");
+        println("Отгадываемое слово: " + word);
+        println("Количество набранных очков: " + points);
+    }
+
+    public static void gameLost(String word){
+        println("К сожалению, вы исчерпали все попытки...");
+        println("Игра окончена!");
+        println("Отгадываемое слово: " + word);
+        println("Количество набранных очков: " + points);
     }
 
 
