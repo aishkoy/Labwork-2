@@ -5,9 +5,15 @@ import java.util.Scanner;
 public class FirstFile {
     static Random rand = new Random();
     static Scanner sc = new Scanner(System.in);
+
     static String[] encodedWord;
     public static int points;
-    static String usedLetters = "";
+
+    static int toursNum = 3;
+    static String[] usedWords = new String[toursNum];
+    static int[] attemptsLeftInEachRound = new int[toursNum];
+    static int[] scoreInEachRound = new int[toursNum];
+
 
     public static void main(String[] args) {
         tourLaunch();
@@ -15,31 +21,49 @@ public class FirstFile {
     }
 
     public static void tourLaunch(){
-        String[] words = selectCategory();
-        String word = selectWord(words);
-        getEncodedWord(word);
-        int numberOfAttempts = 3;
+        for(int i = 0; i < toursNum; i++){
+            printf("Тур №%d%n%n", (i+1));
 
-        println("Загадываемое слово: " + Arrays.toString(encodedWord));
-        while(checkEncodedWord() && numberOfAttempts > 0){
-            println("Осталось попыток: " + numberOfAttempts );
-            String replacementLetter = chooseLetter();
-            if(replaceLetterInEncodedWord(word, replacementLetter)){
-                println("Вы нашли букву!");
-            } else {
-                println("Такой буквы нет...");
-                numberOfAttempts--;
+            String[] words = selectCategory();
+            String word;
+
+            do{
+                 word = selectWord(words);
+            } while (wasWordUsedBefore(word));
+
+            String usedLetters = "";
+            usedWords[i] = word;
+            getEncodedWord(word);
+
+            int numberOfAttempts = 3;
+            println("Загадываемое слово: " + Arrays.toString(encodedWord));
+
+            while(checkEncodedWord() && numberOfAttempts > 0){
+                println("Осталось попыток: " + numberOfAttempts );
+                String replacementLetter = chooseLetter(usedLetters);
+
+                usedLetters += replacementLetter;
+                if(replaceLetterInEncodedWord(word, replacementLetter)){
+                    println("Вы нашли букву!");
+                } else {
+                    println("Такой буквы нет...");
+                    numberOfAttempts--;
+                }
+                println("Состояние слова: " + Arrays.toString(encodedWord));
             }
-            println(Arrays.toString(encodedWord));
+
+            attemptsLeftInEachRound[i] = numberOfAttempts;
+            scoreInEachRound[i] = points;
+            if(numberOfAttempts == 0 && checkEncodedWord()){
+                println("\nК сожалению, вы исчерпали все попытки...");
+                endGame(word);
+            } else{
+                println("\nПоздравляем! Вы нашли все буквы!");
+                endGame(word);
+            }
+            points = 0;
         }
-
-        if(numberOfAttempts == 0 && checkEncodedWord()){
-            gameLost(word);
-        } else{
-            gameWon(word);
-        }
-
-
+        printResult();
     }
 
 
@@ -68,15 +92,20 @@ public class FirstFile {
         Arrays.fill(encodedWord, "*");
     }
 
-    public static String chooseLetter(){
+    public static String chooseLetter(String usedLetters){
         while(true){
-            print("Введите букву: ");
+            print("\nВведите букву: ");
             String letter = sc.nextLine().strip().toLowerCase();
             if(!usedLetters.contains(letter) && !letter.isBlank() && letter.length() == 1 && letter.matches("[а-яё]+")){
-                usedLetters += letter;
                 return letter;
             }
-            println("Неверный ввод! Попробуйте еще раз!");
+            if(usedLetters.contains(letter) && !letter.isBlank() && letter.length() == 1){
+                println("\nВы уже раннее вводили такую букву! Введите другую.");
+                continue;
+            }
+            if(!letter.matches("[а-яё]+") || letter.length() != 1 || letter.isBlank()){
+                println("\nНеверный ввод! Попробуйте еще раз!");
+            }
         }
     }
 
@@ -101,21 +130,43 @@ public class FirstFile {
         return false;
     }
 
-    public static void gameWon(String word){
-        println("Поздравляем! Вы нашли все буквы!");
+    public static void endGame(String word){
         println("Игра окончена!");
         println("Отгадываемое слово: " + word);
-        println("Количество набранных очков: " + points);
+        printf("Количество набранных очков: %d.%n%n", points);
     }
 
-    public static void gameLost(String word){
-        println("К сожалению, вы исчерпали все попытки...");
-        println("Игра окончена!");
-        println("Отгадываемое слово: " + word);
-        println("Количество набранных очков: " + points);
+    public static boolean wasWordUsedBefore(String word){
+        for(String s : usedWords){
+            if(s != null && s.equals(word)){
+                return true;
+            }
+        }
+        return false;
     }
 
+    public static int sumOfScores(){
+        int sum = 0;
+        for(int i : scoreInEachRound){
+            sum += i;
+        }
+        return sum;
+    }
 
+    public static void printResult(){
+        String[] rounds = {"- 1 -", "- 2 -", "- 3 -"};
+        String lineHorizontal = "-";
+        String lineVertical = "|";
+        println("\n" + lineHorizontal.repeat(14) + " Finish game " + lineHorizontal.repeat(14));
+        printf("%9s%5s%9s%5s%10s%n", "Round", lineVertical, "Score", lineVertical, "Attempts");
+        String decorativeLine = lineHorizontal.repeat(13) + lineVertical + lineHorizontal.repeat(13) + lineVertical + lineHorizontal.repeat(13);
+        println(decorativeLine);
+        for (int i = 0; i < toursNum; i++) {
+            printf("%9s%5s%7d%7s%7d%n", rounds[i], lineVertical, scoreInEachRound[i], lineVertical, attemptsLeftInEachRound[i]);
+        }
+        println(decorativeLine);
+        printf("%9s%5s%7d%7s%7d%n", "Total", lineVertical, sumOfScores(), lineVertical, 1);
+    }
 
     public static void println(String str){
         System.out.println(str);
@@ -123,5 +174,9 @@ public class FirstFile {
 
     public static void print(String str){
         System.out.print(str);
+    }
+
+    public static void printf(String str, Object... args){
+        System.out.printf(str, args);
     }
 }
