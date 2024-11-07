@@ -46,7 +46,9 @@ public class FieldOfWonders {
         usedWords[roundNumber] = guessedWord;
         encodeWord(guessedWord);
 
+        points = 0;
         int numberOfAttempts = 3;
+
         println("Загадываемое слово: " + Arrays.toString(encodedWord));
 
         while (isWordNotGuessed() && numberOfAttempts > 0) {
@@ -79,14 +81,13 @@ public class FieldOfWonders {
 
         attemptsLeftInEachRound[roundNumber] = numberOfAttempts;
         scoreInEachRound[roundNumber] = points;
+
         if (numberOfAttempts == 0 && isWordNotGuessed()) {
             println("\nК сожалению, вы проиграли...");
-            endGame(guessedWord);
         } else {
             println("\nПоздравляем! Вы победили в этом раунде!");
-            endGame(guessedWord);
         }
-        points = 0;
+        endGame(guessedWord);
     }
 
 
@@ -94,7 +95,7 @@ public class FieldOfWonders {
         String[] categories = {"Города", "Фрукты", "Животные"};
         int indexOfCategory = rand.nextInt(categories.length);
 
-        println("Категория: " + categories[indexOfCategory]);
+        println("\nКатегория: " + categories[indexOfCategory]);
         switch (indexOfCategory) {
             case 0 :
                 return new String[]{"Бишкек", "Москва", "Новосибирск"};
@@ -157,7 +158,7 @@ public class FieldOfWonders {
     public static void endGame(String guessedWord){
         println("Игра окончена!");
         println("Отгадываемое слово: " + guessedWord);
-        printf("Количество набранных очков: %.1f.%n%n", points);
+        printf("Количество набранных очков: %.1f.%n%n%n", points);
     }
 
     public static boolean wasWordUsedBefore(String guessedWord){
@@ -197,6 +198,7 @@ public class FieldOfWonders {
             print("\nХотите сыграть еще? (введите да/нет): ");
             String answer = sc.nextLine().strip().toLowerCase();
             if(answer.equals("да")){
+                println("");
                 return true;
             } else if (answer.equals("нет")) {
                 println("Спасибо за игру! До свидания.");
@@ -222,7 +224,6 @@ public class FieldOfWonders {
             } else {
                 println("Неверный ввод! Пожалуйста, выберите 1 или 2.");
             }
-            println("");
         }
     }
 
