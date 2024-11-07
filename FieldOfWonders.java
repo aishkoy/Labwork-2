@@ -23,7 +23,6 @@ public class FieldOfWonders {
             }
             printResult();
         } while (isGameRestarted());
-        sc.close();
     }
 
     public static void gameReset(){
@@ -121,16 +120,22 @@ public class FieldOfWonders {
             print("\nВведите букву: ");
             String letter = sc.nextLine().strip().toLowerCase();
 
-            if(!usedLetters.contains(letter) && !letter.isBlank() && letter.length() == 1 && letter.matches("[а-яё]+")){
-                return letter;
-            }
-            if(usedLetters.contains(letter) && !letter.isBlank() && letter.length() == 1){
-                println("\nВы уже раннее вводили такую букву! Введите другую.");
+            if (letter.isBlank() || letter.length() != 1) {
+                println("\nНеверный ввод! Пожалуйста, введите одну букву.");
                 continue;
             }
-            if(!letter.matches("[а-яё]+") || letter.length() != 1 || letter.isBlank()){
-                println("\nНеверный ввод! Попробуйте еще раз!");
+
+            if (!letter.matches("[а-яё]")) {
+                println("\nНеверный ввод! Буква должна быть на русском языке.");
+                continue;
             }
+
+            if (usedLetters.contains(letter)) {
+                println("\nВы уже использовали эту букву! Введите другую.");
+                continue;
+            }
+
+            return letter;
         }
     }
 
@@ -231,12 +236,23 @@ public class FieldOfWonders {
         while (true) {
             print("\nВведите ваше слово: ");
             String input = sc.nextLine().strip().toLowerCase();
-
-            if (input.length() == guessedWord.length() && input.matches("[а-яё]+")) {
-                return input;
-            } else {
-                println("Неверное слово! Возможно количество букв в вашем слове больше или меньше количества букв в загаданном. Введите слово еще раз.");
+            
+            if (input.isBlank()) {
+                println("Слово не может быть пустым! Попробуйте снова.");
+                continue;
             }
+
+            if (input.length() != guessedWord.length()) {
+                println("Неверное слово! Количество букв должно совпадать с загаданным.");
+                continue;
+            }
+
+            if (!input.matches("[а-яё]+")) {
+                println("Неверный ввод! Слово должно содержать только русские буквы.");
+                continue;
+            }
+
+            return input;
         }
     }
 
