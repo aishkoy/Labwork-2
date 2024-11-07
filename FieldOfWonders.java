@@ -36,38 +36,38 @@ public class FieldOfWonders {
         println("Тур №" + (roundNumber + 1));
 
         String[] words = selectCategory();
-        String word;
+        String guessedWord;
 
         do {
-            word = selectWord(words);
-        } while (wasWordUsedBefore(word));
+            guessedWord = selectWord(words);
+        } while (wasWordUsedBefore(guessedWord));
 
         String usedLetters = "";
-        usedWords[roundNumber] = word;
-        getEncodedWord(word);
+        usedWords[roundNumber] = guessedWord;
+        encodeWord(guessedWord);
 
         int numberOfAttempts = 3;
         println("Загадываемое слово: " + Arrays.toString(encodedWord));
 
-        while (checkEncodedWord() && numberOfAttempts > 0) {
+        while (isWordNotGuessed() && numberOfAttempts > 0) {
             println("Осталось попыток: " + numberOfAttempts);
 
             String action = chooseAction();
             if (action.equals("word")) {
-                String input = chooseWord(word);
-                if (input.equalsIgnoreCase(word)) {
+                String input = chooseWord(guessedWord);
+                if (input.equalsIgnoreCase(guessedWord)) {
                     points = 0;
-                    points += word.length() + (word.length() * 0.05);
-                    println("Поздравляем! Вы угадали слово.");
+                    points += guessedWord.length() + (guessedWord.length() * 0.05);
+                    println("Вы угадали слово!");
                 } else {
-                    println("Неверное слово. Игра окончена.");
+                    println("Неверное слово...");
                     numberOfAttempts = 0;
                 }
                 break;
             } else {
-                String replacementLetter = chooseLetter(usedLetters);
-                usedLetters += replacementLetter;
-                if (replaceLetterInEncodedWord(word, replacementLetter)) {
+                String userGuessLetter = chooseLetter(usedLetters);
+                usedLetters += userGuessLetter;
+                if (replaceLetterInEncodedWord(guessedWord, userGuessLetter)) {
                     println("Вы нашли букву!");
                 } else {
                     println("Такой буквы нет...");
@@ -79,12 +79,12 @@ public class FieldOfWonders {
 
         attemptsLeftInEachRound[roundNumber] = numberOfAttempts;
         scoreInEachRound[roundNumber] = points;
-        if (numberOfAttempts == 0 && checkEncodedWord()) {
-            println("\nК сожалению, вы исчерпали все попытки...");
-            endGame(word);
+        if (numberOfAttempts == 0 && isWordNotGuessed()) {
+            println("\nК сожалению, вы проиграли...");
+            endGame(guessedWord);
         } else {
             println("\nПоздравляем! Вы победили в этом раунде!");
-            endGame(word);
+            endGame(guessedWord);
         }
         points = 0;
     }
@@ -110,8 +110,8 @@ public class FieldOfWonders {
         return words[indexOfWord];
     }
 
-    public static void getEncodedWord(String word){
-        encodedWord = new String[word.length()];
+    public static void encodeWord(String guessedWord){
+        encodedWord = new String[guessedWord.length()];
         Arrays.fill(encodedWord, "*");
     }
 
@@ -119,6 +119,7 @@ public class FieldOfWonders {
         while(true){
             print("\nВведите букву: ");
             String letter = sc.nextLine().strip().toLowerCase();
+
             if(!usedLetters.contains(letter) && !letter.isBlank() && letter.length() == 1 && letter.matches("[а-яё]+")){
                 return letter;
             }
@@ -132,11 +133,11 @@ public class FieldOfWonders {
         }
     }
 
-    public static boolean replaceLetterInEncodedWord(String word, String replacementLetter){
+    public static boolean replaceLetterInEncodedWord(String guessedWord, String replacementLetter){
         boolean isLetterFound = false;
-        for(int i = 0; i < word.length(); i++){
-            if(replacementLetter.equalsIgnoreCase(String.valueOf(word.charAt(i)))){
-                encodedWord[i] = String.valueOf(word.charAt(i));
+        for(int i = 0; i < guessedWord.length(); i++){
+            if(replacementLetter.equalsIgnoreCase(String.valueOf(guessedWord.charAt(i)))){
+                encodedWord[i] = String.valueOf(guessedWord.charAt(i));
                 points++;
                 isLetterFound =  true;
             }
@@ -144,7 +145,7 @@ public class FieldOfWonders {
         return isLetterFound;
     }
 
-    public static boolean checkEncodedWord(){
+    public static boolean isWordNotGuessed(){
         for (String s : encodedWord) {
             if (s.equals("*")) {
                 return true;
@@ -153,15 +154,15 @@ public class FieldOfWonders {
         return false;
     }
 
-    public static void endGame(String word){
+    public static void endGame(String guessedWord){
         println("Игра окончена!");
-        println("Отгадываемое слово: " + word);
+        println("Отгадываемое слово: " + guessedWord);
         printf("Количество набранных очков: %.1f.%n%n", points);
     }
 
-    public static boolean wasWordUsedBefore(String word){
+    public static boolean wasWordUsedBefore(String guessedWord){
         for(String s : usedWords){
-            if(s != null && s.equals(word)){
+            if(s != null && s.equals(guessedWord)){
                 return true;
             }
         }
@@ -221,22 +222,22 @@ public class FieldOfWonders {
             } else {
                 println("Неверный ввод! Пожалуйста, выберите 1 или 2.");
             }
+            println("");
         }
     }
 
-    public static String chooseWord(String word) {
+    public static String chooseWord(String guessedWord) {
         while (true) {
             print("\nВведите ваше слово: ");
             String input = sc.nextLine().strip().toLowerCase();
 
-            if (input.length() == word.length() && input.matches("[а-яё]+")) {
+            if (input.length() == guessedWord.length() && input.matches("[а-яё]+")) {
                 return input;
             } else {
-                println("Неверное слово! Попробуйте еще раз.");
+                println("Неверное слово! Возможно количество букв в вашем слове больше или меньше количества букв в загаданном. Введите слово еще раз.");
             }
         }
     }
-
 
     public static void println(String str){
         System.out.println(str);
