@@ -2,7 +2,7 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
-public class FirstFile {
+public class FieldOfWonders {
     static Random rand = new Random();
     static Scanner sc = new Scanner(System.in);
 
@@ -17,75 +17,76 @@ public class FirstFile {
 
     public static void main(String[] args) {
         do{
-        initializeGame();
-        tourLaunch();
+            gameReset();
+            for (int i = 0; i < toursNum; i++) {
+                tourLaunch(i);
+            }
+            printResult();
         } while (isGameRestarted());
         sc.close();
     }
 
-    public static void initializeGame(){
+    public static void gameReset(){
         usedWords = new String[toursNum];
         attemptsLeftInEachRound = new int[toursNum];
         scoreInEachRound = new double[toursNum];
     }
 
-    public static void tourLaunch(){
-        for(int i = 0; i < toursNum; i++){
-            printf("Тур №%d%n%n", (i+1));
+    public static void tourLaunch(int roundNumber) {
+        println("Тур №" + (roundNumber + 1));
 
-            String[] words = selectCategory();
-            String word;
+        String[] words = selectCategory();
+        String word;
 
-            do{
-                 word = selectWord(words);
-            } while (wasWordUsedBefore(word));
+        do {
+            word = selectWord(words);
+        } while (wasWordUsedBefore(word));
 
-            String usedLetters = "";
-            usedWords[i] = word;
-            getEncodedWord(word);
+        String usedLetters = "";
+        usedWords[roundNumber] = word;
+        getEncodedWord(word);
 
-            int numberOfAttempts = 3;
-            println("Загадываемое слово: " + Arrays.toString(encodedWord));
+        int numberOfAttempts = 3;
+        println("Загадываемое слово: " + Arrays.toString(encodedWord));
 
-            while(checkEncodedWord() && numberOfAttempts > 0){
-                println("Осталось попыток: " + numberOfAttempts );
+        while (checkEncodedWord() && numberOfAttempts > 0) {
+            println("Осталось попыток: " + numberOfAttempts);
 
-                String action  = chooseAction();
-                if(action.equals("word")){
-                    String input = chooseWord(word);
-                    if (input.equalsIgnoreCase(word)) {
-                        points += word.length() + (word.length() * 0.05);
-                        println("Поздравляем! Вы угадали слово.");
-                    } else {
-                        println("Неверное слово. Игра окончена.");
-                        numberOfAttempts = 0;
-                    }
-                    break;
-                } else{
-                    String replacementLetter = chooseLetter(usedLetters);
-                    usedLetters += replacementLetter;
-                    if(replaceLetterInEncodedWord(word, replacementLetter)){
-                        println("Вы нашли букву!");
-                    } else {
-                        println("Такой буквы нет...");
-                        numberOfAttempts--;
-                    }
+            String action = chooseAction();
+            if (action.equals("word")) {
+                String input = chooseWord(word);
+                if (input.equalsIgnoreCase(word)) {
+                    points = 0;
+                    points += word.length() + (word.length() * 0.05);
+                    println("Поздравляем! Вы угадали слово.");
+                } else {
+                    println("Неверное слово. Игра окончена.");
+                    numberOfAttempts = 0;
                 }
-                println("Состояние слова: " + Arrays.toString(encodedWord));
+                break;
+            } else {
+                String replacementLetter = chooseLetter(usedLetters);
+                usedLetters += replacementLetter;
+                if (replaceLetterInEncodedWord(word, replacementLetter)) {
+                    println("Вы нашли букву!");
+                } else {
+                    println("Такой буквы нет...");
+                    numberOfAttempts--;
+                }
             }
-
-            attemptsLeftInEachRound[i] = numberOfAttempts;
-            scoreInEachRound[i] = points;
-            if(numberOfAttempts == 0 && checkEncodedWord()){
-                println("\nК сожалению, вы исчерпали все попытки...");
-                endGame(word);
-            } else{
-                println("\nПоздравляем! Вы победили в этом раунде!");
-                endGame(word);
-            }
-            points = 0;
+            println("Состояние слова: " + Arrays.toString(encodedWord));
         }
-        printResult();
+
+        attemptsLeftInEachRound[roundNumber] = numberOfAttempts;
+        scoreInEachRound[roundNumber] = points;
+        if (numberOfAttempts == 0 && checkEncodedWord()) {
+            println("\nК сожалению, вы исчерпали все попытки...");
+            endGame(word);
+        } else {
+            println("\nПоздравляем! Вы победили в этом раунде!");
+            endGame(word);
+        }
+        points = 0;
     }
 
 
@@ -194,7 +195,7 @@ public class FirstFile {
         while(true){
             print("\nХотите сыграть еще? (введите да/нет): ");
             String answer = sc.nextLine().strip().toLowerCase();
-            if(answer.equalsIgnoreCase("да")){
+            if(answer.equals("да")){
                 return true;
             } else if (answer.equals("нет")) {
                 println("Спасибо за игру! До свидания.");
