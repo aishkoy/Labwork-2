@@ -10,14 +10,23 @@ public class FirstFile {
     public static int points;
 
     static int toursNum = 3;
-    static String[] usedWords = new String[toursNum];
-    static int[] attemptsLeftInEachRound = new int[toursNum];
-    static int[] scoreInEachRound = new int[toursNum];
+    static String[] usedWords;
+    static int[] attemptsLeftInEachRound;
+    static int[] scoreInEachRound;
 
 
     public static void main(String[] args) {
+        do{
+        initializeGame();
         tourLaunch();
+        } while (isGameRestarted());
         sc.close();
+    }
+
+    public static void initializeGame(){
+        usedWords = new String[toursNum];
+        attemptsLeftInEachRound = new int[toursNum];
+        scoreInEachRound = new int[toursNum];
     }
 
     public static void tourLaunch(){
@@ -167,6 +176,22 @@ public class FirstFile {
         println(decorativeLine);
         printf("%9s%5s%7d%7s%7d%n", "Total", lineVertical, sumOfScores(), lineVertical, 1);
     }
+
+    public static boolean isGameRestarted(){
+        while(true){
+            print("\nХотите сыграть еще? (введите да/нет): ");
+            String answer = sc.nextLine().strip().toLowerCase();
+            if(answer.equalsIgnoreCase("да")){
+                return true;
+            } else if (answer.equals("нет")) {
+                println("Спасибо за игру! До свидания.");
+                return false;
+            } else {
+                println("Неверный ввод. Пожалуйста, введите 'да' или 'нет'.");
+            }
+        }
+    }
+
 
     public static void println(String str){
         System.out.println(str);
